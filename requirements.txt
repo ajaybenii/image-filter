@@ -1,0 +1,14 @@
+colour-science
+imageio
+numpy
+fastapi
+pilgram
+pillow
+requests
+python-multipart
+opencv-python-headless
+aiofiles
+uvloop
+httptools
+uvicorn
+gunicorn

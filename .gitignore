@@ -1,0 +1,7 @@
+**__pycache__
+
+# Env files
+.venv
+poetry.lock
+Pipfile
+.DS_Store
