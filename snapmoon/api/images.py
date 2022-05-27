@@ -13,10 +13,8 @@ from pydantic import BaseModel, HttpUrl
 
 from snapmoon.pylut import process_image
 
-
 router = APIRouter()
 log = logging.getLogger("uvicorn")
-
 
 class LutFilter(str, Enum):
     bluesky = 'bluesky'
@@ -27,7 +25,6 @@ class LutFilter(str, Enum):
     coolwhite = 'coolwhite'
     vibrantsunset = 'vibrantsunset'
     yellowtowhite = 'yellowtowhite'
-
 
 class Filter(str, Enum):
     _1977 = '_1977'
@@ -58,21 +55,8 @@ class Filter(str, Enum):
     xpro2 = 'xpro2'
 
 
-@router.get("/filter-by-url")
-async def apply_filter_by_url(image_url: str, filter: Filter):
-    """
-    Provide an image from the image_url and then specify the filter specified
-    using the filter argument and this endpoint then returns the edited image
-    file.
-    """
-    response = requests.get(image_url)
-    image_bytes = response.content
-    image_path = apply_filter(image_bytes, filter)
-    return FileResponse(image_path, media_type="image/jpg")
-
-
 @router.get("/sqy-filter-by-url")
-async def apply_sqy_filter_by_url(image_url: str, lut_filter: LutFilter):
+async def apply_sqy_filter_by_url(image_url: str, select_filter: LutFilter):
     """
     Provide an image from the image_url and then specify the filter specified
     using the filter argument and this endpoint then returns the edited image
@@ -80,31 +64,18 @@ async def apply_sqy_filter_by_url(image_url: str, lut_filter: LutFilter):
     """
     response = requests.get(image_url)
     image_bytes = response.content
-    image_path = apply_lut(image_bytes, lut_filter)
+    image_path = apply_lut(image_bytes, select_filter)
     return FileResponse(image_path, media_type="image/jpg")
-
 
 @router.post("/sqy-filter-by-file")
-async def apply_sqy_filter_on_file(image_file: UploadFile=File(...), lut_filter: LutFilter=Form(...)):
+async def apply_sqy_filter_on_file(image_file: UploadFile=File(...), select_filter: LutFilter=Form(...)):
     """
     Takes the file from the request and applies from the 8 SquareYards filter specified by the
     user and then returns the edited image file.
     """
     image_bytes = await image_file.read()
-    image_path = apply_lut(image_bytes, lut_filter)
+    image_path = apply_lut(image_bytes, select_filter)
     return FileResponse(image_path, media_type="image/jpg")
-
-
-@router.post("/filter-by-file")
-async def apply_filter_on_file(image_file: UploadFile=File(...), filter: Filter=Form(...)):
-    """
-    Takes the file from the request and applies the filter specified by the
-    user and then returns the edited image file.
-    """
-    image_bytes = await image_file.read()
-    image_path = apply_filter(image_bytes, filter)
-    return FileResponse(image_path, media_type="image/jpg")
-
 
 def apply_filter(image_bytes: bytes, filter: Filter):
     """
@@ -118,7 +89,6 @@ def apply_filter(image_bytes: bytes, filter: Filter):
     new_im = filter_method(im)
     new_im.save(image_path)
     return image_path
-
 
 def apply_lut(image_bytes: bytes, lut_filter: LutFilter):
     """
