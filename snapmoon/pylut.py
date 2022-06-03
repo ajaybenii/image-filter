@@ -29,7 +29,6 @@ def read_lut(lut_path, clip=False):
 
     return lut
 
-
 def process_image(im, output_path, lut_name, log=False, no_prefix=False, quality=95):
     """Opens the image at <image_path>, transforms it using the passed
     <lut> with trilinear interpolation, and saves the image at
