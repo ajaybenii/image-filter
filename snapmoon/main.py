@@ -17,7 +17,7 @@ def create_app():
     Returns the app after performing all the initialisation steps
     """
     application = FastAPI(
-        title="SQY Snapmoon",
+        title="Image enhanchment",
         description="This project applies filters on the real estate related"
             " images and is a proprietary software.",
         version="1.0.1"
