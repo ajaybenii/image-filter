@@ -12,3 +12,4 @@ uvloop
 httptools
 uvicorn
 gunicorn
+python==3.8.5
