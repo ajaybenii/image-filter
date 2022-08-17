@@ -1,5 +1,5 @@
-# images.py
 import io
+import os
 import logging
 from typing import Optional
 import requests
@@ -11,6 +11,7 @@ import pilgram
 from fastapi import Form, File, UploadFile, APIRouter
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, HttpUrl
+from urllib.parse import urlparse
 from fastapi.param_functions import Query
 
 from snapmoon.pylut import process_image
@@ -33,50 +34,6 @@ class LutFilter(str, Enum):
 class LutFilters(str, Enum):
     No_filter = "No_filter"
 
-
-
-# class Filter(str, Enum):
-#     _1977 = '_1977'
-#     aden = 'aden'
-#     brannan = 'brannan'
-#     brooklyn = 'brooklyn'
-#     clarendon = 'clarendon'
-#     earlybird = 'earlybird'
-#     gingham = 'gingham'
-#     hudson = 'hudson'
-#     inkwell = 'inkwell'
-#     kelvin = 'kelvin'
-#     lark = 'lark'
-#     lofi = 'lofi'
-#     maven = 'maven'
-#     mayfair = 'mayfair'
-#     moon = 'moon'
-#     nashville = 'nashville'
-#     perpetua = 'perpetua'
-#     reyes = 'reyes'
-#     rise = 'rise'
-#     slumber = 'slumber'
-#     stinson = 'stinson'
-#     toaster = 'toaster'
-#     valencia = 'valencia'
-#     walden = 'walden'
-#     willow = 'willow'
-#     xpro2 = 'xpro2'
-
-
-# @router.get("/filter-by-url")
-# async def apply_filter_by_url(image_url: str, filter: Filter):
-#     """
-#     Provide an image from the image_url and then specify the filter specified
-#     using the filter argument and this endpoint then returns the edited image
-#     file.
-#     """
-#     response = requests.get(image_url)
-#     image_bytes = response.content
-#     image_path = apply_filter(image_bytes, filter)
-#     return FileResponse(image_path, media_type="image/jpg")
-
-
 @router.get("/filter-by-url")
 async def apply_filter_by_url(image_url: str,  Select_filter: str = Query("Normal", enum=['Brighter','Blue','Grey','Orange','Shadow','Coolwhite','Gold','Yellowtowhite'])):
     """
@@ -84,72 +41,78 @@ async def apply_filter_by_url(image_url: str,  Select_filter: str = Query("Norma
     using the filter argument and this endpoint then returns the edited image
     file.
     """
-    # if Select_filter == LutFilters.No_filter:
-    #     return FileResponse(image_path, media_type="image/jpg")
+    parsed = urlparse(image_url)
+    filename = (os.path.basename(parsed.path))
+
     if Select_filter == 'Normal':
+
         response = requests.get(image_url)
+        image_bytes = response.content
         image_file = io.BytesIO(image_bytes)
         im = Image.open(image_file) 
-
-        im.save("edited_image.jpg")
-        image_path = "edited_image.jpg"
-        return FileResponse(image_path, media_type="image/jpg")
+        
+        img_format = im.format.lower()
+        im.save("edited_image."+img_format)
+        image_path = "edited_image."+img_format
+        return FileResponse(image_path, headers={'Content-Disposition': 'inline; filename="%s"' %(filename,)})
 
     if Select_filter == 'Blue':
         Select_filter =LutFilter.bluesky
+        
         response = requests.get(image_url)
         image_bytes = response.content
         image_path = apply_lut(image_bytes, Select_filter)
-        return FileResponse(image_path, media_type="image/jpg")
+
+        return FileResponse(image_path,headers={'Content-Disposition': 'inline; filename="%s"' %(filename,)})
 
     if Select_filter == 'Brighter':
         Select_filter =LutFilter.brighterwhite
         response = requests.get(image_url)
         image_bytes = response.content
         image_path = apply_lut(image_bytes, Select_filter)
-        return FileResponse(image_path, media_type="image/jpg")
+        return FileResponse(image_path,headers={'Content-Disposition': 'inline; filename="%s"' %(filename,)})
     
     if Select_filter == 'Grey':
         Select_filter =LutFilter.bluetogrey
         response = requests.get(image_url)
         image_bytes = response.content
         image_path = apply_lut(image_bytes, Select_filter)
-        return FileResponse(image_path, media_type="image/jpg")
+        return FileResponse(image_path,headers={'Content-Disposition': 'inline; filename="%s"' %(filename,)})
 
     if Select_filter == 'Orange':
         Select_filter =LutFilter.bluetoorange
         response = requests.get(image_url)
         image_bytes = response.content
         image_path = apply_lut(image_bytes, Select_filter)
-        return FileResponse(image_path, media_type="image/jpg")
+        return FileResponse(image_path,headers={'Content-Disposition': 'inline; filename="%s"' %(filename,)})
     
     if Select_filter == 'Shadow':
         Select_filter =LutFilter.coolshadow
         response = requests.get(image_url)
         image_bytes = response.content
         image_path = apply_lut(image_bytes, Select_filter)
-        return FileResponse(image_path, media_type="image/jpg")
+        return FileResponse(image_path,headers={'Content-Disposition': 'inline; filename="%s"' %(filename,)})
     
     if Select_filter == 'Coolwhite':
         Select_filter =LutFilter.coolwhite
         response = requests.get(image_url)
         image_bytes = response.content
         image_path = apply_lut(image_bytes, Select_filter)
-        return FileResponse(image_path, media_type="image/jpg")
+        return FileResponse(image_path,headers={'Content-Disposition': 'inline; filename="%s"' %(filename,)})
     
     if Select_filter == 'Gold':
         Select_filter =LutFilter.vibrantsunset
         response = requests.get(image_url)
         image_bytes = response.content
         image_path = apply_lut(image_bytes, Select_filter)
-        return FileResponse(image_path, media_type="image/jpg")
+        return FileResponse(image_path,headers={'Content-Disposition': 'inline; filename="%s"' %(filename,)})
 
     if Select_filter == 'Yellowtowhite':
         Select_filter =LutFilter.yellowtowhite
         response = requests.get(image_url)
         image_bytes = response.content
         image_path = apply_lut(image_bytes, Select_filter)
-        return FileResponse(image_path, media_type="image/jpg")
+        return FileResponse(image_path,headers={'Content-Disposition': 'inline; filename="%s"' %(filename,)})
         
 
 
@@ -217,37 +180,13 @@ async def apply_filter_on_file(image_file: UploadFile=File(...), Select_filter: 
         return FileResponse(image_path, media_type="image/jpg")
     
 
-# @router.post("/filter-by-file")
-# async def apply_filter_on_file(image_file: UploadFile=File(...), filter: Filter=Form(...)):
-#     """
-#     Takes the file from the request and applies the filter specified by the
-#     user and then returns the edited image file.
-#     """
-#     image_bytes = await image_file.read()
-#     image_path = apply_filter(image_bytes, filter)
-#     return FileResponse(image_path, media_type="image/jpg")
-
-
-# def apply_filter(image_bytes: bytes, filter: Filter):
-#     """
-#     Abstracted function that takes an file as bytes and applies the filter.
-#     """
-#     log.info(f"Applying {filter} filter")
-#     image_file = io.BytesIO(image_bytes)
-#     im = Image.open(image_file)
-#     image_path = "edited_image.jpg"
-#     filter_method = getattr(pilgram, filter)
-#     new_im = filter_method(im)
-#     new_im.save(image_path)
-#     return image_path
-
-
 def apply_lut(image_bytes: bytes, Select_filter: LutFilter):
     """
     Apply the lut to the image
     """
     image_file = io.BytesIO(image_bytes)
     im = Image.open(image_file)
-    image_path = "edited_image.jpg"
+    img_format = im.format.lower()
+    image_path = "edited_image."+img_format
     process_image(im, image_path, Select_filter)
     return image_path
