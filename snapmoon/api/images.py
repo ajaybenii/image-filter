@@ -325,8 +325,7 @@ async def image_quality_checker(URL1):
     result_check1 = calculate_sharpness(image)
     wid,hgt = image.size
 
-    if (str(wid)) < (str(380)):
-        print(wid, hgt)
+    if ((int(wid)) < (int(380))):
         result_check1 = 3
 
     buffer = BytesIO()
