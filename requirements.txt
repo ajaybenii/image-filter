@@ -9,6 +9,7 @@ python-multipart
 opencv-python-headless
 aiofiles
 uvloop
+aiohttp
 httptools
 uvicorn
 gunicorn
