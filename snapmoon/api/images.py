@@ -332,4 +332,4 @@ async def image_quality_checker(URL1):
     image.save(buffer, format=format_)
     buffer.seek(0)
 
-    return ({"quality":result_check1/10})
+    return ({"quality":result_check1})
