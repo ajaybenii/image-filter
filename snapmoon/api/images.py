@@ -165,13 +165,13 @@ async def image_quality_checker(URL1):
         ##logger.info("Error: HTTPException(status_code=406, detail=Not a valid URL)")
         raise HTTPException(status_code=406, detail="Not a valid URL")
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(URL1) as resp:
-            contents = await resp.read()
-  
-    async with aiohttp.ClientSession() as session:
-        async with session.get(URL1) as resp:
-            contents = await resp.read()
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(URL1) as resp:
+                contents = await resp.read()
+    except Exception:
+        raise HTTPException(status_code=406, detail="Not a valid URL")
+
 
     if contents == None:
         raise HTTPException(status_code=406, detail="No image found.")
@@ -326,10 +326,7 @@ async def image_quality_checker(URL1):
     wid,hgt = image.size
 
     if ((int(wid)) < (int(380))):
-        result_check1 = 3
 
-    buffer = BytesIO()
-    image.save(buffer, format=format_)
-    buffer.seek(0)
+        result_check1 = 3
 
     return ({"quality":result_check1})
