@@ -182,8 +182,11 @@ async def image_quality_checker(URL1):
     def get_format(filename):
         
         format_ = filename.split(".")[-1]
+        print("format = ",format_)
         if format_.lower() == "jpg":
             format_ = "jpeg"
+        elif format_.lower() == "gif":
+            format_ = "jpg"
         elif format_.lower() == "webp":
             format_ = "WebP"
     
@@ -207,6 +210,8 @@ async def image_quality_checker(URL1):
 
     def calculate_sharpness(image): #here calculate the sharpness 
         image = Image.open(BytesIO(contents))
+        
+        image = image.convert('L')
         image.save("original_img."+format_)
 
         try:
@@ -323,6 +328,7 @@ async def image_quality_checker(URL1):
         return result
     
     result_check1 = calculate_sharpness(image)
+    image.show()
     wid,hgt = image.size
 
     if ((int(wid)) < (int(380))):
