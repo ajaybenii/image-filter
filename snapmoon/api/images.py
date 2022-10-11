@@ -1,6 +1,7 @@
 import io
 import os
 from re import U
+from urllib import response
 import aiohttp
 import cv2
 from io import BytesIO
@@ -161,9 +162,9 @@ async def image_quality_checker(URL1):
         ##logger.info("Error: HTTPException(status_code=406, detail=Not a valid URL)")
         raise HTTPException(status_code=406, detail="Not a valid URL")
     
-    if URL1.lower().endswith((".jpg", ".png", ".jpeg", ".gif", ".webp",".jfif")) == False:
-        ##logger.info("Error: HTTPException(status_code=406, detail=Not a valid URL)")
-        raise HTTPException(status_code=406, detail="Not a valid URL")
+    # if URL1.lower().endswith((".jpg", ".png", ".jpeg", ".gif", ".webp",".jfif")) == False:
+    #     ##logger.info("Error: HTTPException(status_code=406, detail=Not a valid URL)")
+    #     raise HTTPException(status_code=406, detail="Not a valid URL")
 
     try:
         async with aiohttp.ClientSession() as session:
@@ -177,24 +178,10 @@ async def image_quality_checker(URL1):
         raise HTTPException(status_code=406, detail="No image found.")
 
     image = Image.open(BytesIO(contents))
-
-    #this function get the format type of input image
-    def get_format(filename):
-        
-        format_ = filename.split(".")[-1]
-        print("format = ",format_)
-        if format_.lower() == "jpg":
-            format_ = "jpeg"
-        elif format_.lower() == "gif":
-            format_ = "jpg"
-        elif format_.lower() == "webp":
-            format_ = "WebP"
-    
-        return format_
-    
-    format_ = get_format(filename) #here format_ store the type of image by filename
+    format_ = image.format.lower() #here format_ store the type of image by filename
 
     def calculate_brightness(image):
+        image = Image.open(BytesIO(contents))
         greyscale_image = image.convert('L')
         histogram = greyscale_image.histogram()
         pixels = sum(histogram)
@@ -217,7 +204,7 @@ async def image_quality_checker(URL1):
         try:
             img = cv2.imread("original_img."+format_, cv2.IMREAD_GRAYSCALE)
             laplacian_var = cv2.Laplacian(img, cv2.CV_64F).var()
-            print("laplacian try = ", laplacian_var)
+            # print("laplacian try = ", laplacian_var)
 
             img_c = cv2.imread("original_img."+format_)
             Y = cv2.cvtColor(img_c, cv2.COLOR_BGR2YUV)[:,:,0]
@@ -328,11 +315,13 @@ async def image_quality_checker(URL1):
         return result
     
     result_check1 = calculate_sharpness(image)
-    image.show()
+    
     wid,hgt = image.size
 
     if ((int(wid)) < (int(380))):
 
         result_check1 = 3
-
+    parsed = urlparse(URL1)
+    filename1 = (os.path.basename(parsed.path))
+    print(filename1)
     return ({"quality":result_check1})
