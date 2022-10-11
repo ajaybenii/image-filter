@@ -170,6 +170,7 @@ async def image_quality_checker(URL1):
         async with aiohttp.ClientSession() as session:
             async with session.get(URL1) as resp:
                 contents = await resp.read()
+
     except Exception:
         raise HTTPException(status_code=406, detail="Not a valid URL")
 
@@ -178,7 +179,23 @@ async def image_quality_checker(URL1):
         raise HTTPException(status_code=406, detail="No image found.")
 
     image = Image.open(BytesIO(contents))
-    format_ = image.format.lower() #here format_ store the type of image by filename
+
+    def get_format(filename):
+
+        format_ = image.format.lower()
+
+        if format_.lower() == "jpg":
+            format_ = "jpeg"
+        elif format_.lower() == "jpeg":
+            format_ = "jpeg"
+        elif format_.lower() == "gif":
+            format_ = "jpg"
+        elif format_.lower() == "webp":
+            format_ = "webp"
+
+        return format_
+
+    format_ = get_format(filename) #here format_ store the type of image by filename
 
     def calculate_brightness(image):
         image = Image.open(BytesIO(contents))
@@ -321,7 +338,5 @@ async def image_quality_checker(URL1):
     if ((int(wid)) < (int(380))):
 
         result_check1 = 3
-    parsed = urlparse(URL1)
-    filename1 = (os.path.basename(parsed.path))
-    print(filename1)
+
     return ({"quality":result_check1})
